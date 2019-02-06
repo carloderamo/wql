@@ -1,0 +1,7 @@
+\section{Conclusions}\label{S:Conclusions}
+We have presented a new estimator for the maximum expected value of a set of random variables, based on a weighted averase of the sample means. 
+We tested it on different domains with different settings and we evaluated its performance compared to the state of the art. 
+The experimental results confirm what has been demonstrated in the theorical analysis, showing that no estimator is always the best. Nevertheless, our estimator has a robust behaviour performing well in all conditions and obtaining the best performance in intermediate cases.\\
+Further researches will be done using different distributions instead of the Gaussian if the variable distribution of the problem is known, even if Gaussian approximation seems to work well in practice.
+Another worthwhile study would be to define theoretical conditions where Weighted policy is more helpful than other policies.
+Finally, for the application to reinforcement learning, it will be interesting to extend the proposed estimator when the Q-values are represented through regression models such as trees or neural networks.

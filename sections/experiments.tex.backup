@@ -1,0 +1,145 @@
+\begin{figure*}[t]
+    \begin{minipage}{\textwidth}
+    \centering 
+    \setlength\figureheight{4cm}
+    \setlength\figurewidth{4.9cm}
+    \subfigure[First experiment\label{F:ia_first}]{\input{imgs/internetAds-impressions.tikz}}
+    \subfigure[Second experiment\label{F:ia_second}]{\input{imgs/internetAds-actions.tikz}}
+    \subfigure[Third experiment\label{F:ia_third}]{\input{imgs/internetAds-probs.tikz}}
+    \caption{MSE error for each setting. Results are averaged over 2,000 experiments.}\label{F:iAds}
+    \end{minipage}
+\end{figure*}
+
+\section{Experiments}\label{S:Experiments}
+In this section we empirically compare the performance of \WE, \ME, and \CV~on four sequential decision-making problems: two multi-armed bandit domains and two Markov decision problems.
+
+\subsection{Multi-Armed Bandits}
+In the multi-armed bandit problem, a learner wants to identify the action (arm) associated to the largest mean reward.
+In some domains, we are not interested only in knowing which is the best action, but we want also an accurate estimate of its expected reward.
+
+\subsubsection{Internet Ads}
+We consider the problem as formulated in~\cite{van2013estimating}.
+The goal of this problem is to select the best ad to show on a website among a set of $M$ possible ads, each one with an unknown expected return per visitor. 
+Assuming that each ad has the same return per click, the best ad is the one with the maximum click rate.
+Since the click rates are unknown, we need to estimate them from data.
+In our setting, given $N$ visitors, each ad is shown the same number of times, so that we have $N/M$ samples to compute the sample click rate.
+A quick and accurate estimate of the maximum click rate may be relevant to determine future investment strategies.
+% Once these probabilities are available one would want to find the ad which maximizes the expected return. 
+% Moreover, the learning time of probabilities is critical for the website which wants to find the best ad as soon as possible because showing an ad induces a cost $c$. 
+We compared the results of \ME, \CV, and \WE~in three different settings. 
+We consider a default configuration where we have $N=300,000$ visitors, $M = 30$ ads and mean click rates uniformly sampled from the interval $[0.02,0.05]$.
+In the first experiment, we vary the number of visitors $N = \lbrace 30,000, 60,000, ..., 270,000, 300,000 \rbrace$, so that the number of impressions per ad ranges from $1,000$ to $10,000$.
+In the second experiment, we vary the number of ads $M = \lbrace 10, 20, ..., 90, 100 \rbrace$ and the number of visitors is set to $N=10,000\cdot M$.
+In the last experiment, we modify the interval of the mean click rates by changing the value of the upper limit with values in $\lbrace 0.02, 0.03, ..., 0.09, 0.1 \rbrace$, with the lower fixed at $0.02$.
+
+In Figure \ref{F:iAds}, we show the $MSE = bias^2 + variance$ for the three experiments comparing the results obtained by each estimator. 
+In the first experiment (Figure~\ref{F:ia_first}), as expected, the MSE decreases for all estimators as the number of impressions increases and \WE~has the lowest MSE in all cases. It is interesting to see how the ME estimator has a very large bias in the leftmost case, which shows (accordingly to Figure \ref{F:absolute_bias}) that ME estimator suffers large bias when only a few samples are available and, therefore, the variances of the sample means are large.
+From Figure~\ref{F:ia_second} we can notice that an increasing number of actions has a negative effect on \ME~and a positive effect on the \CV~due to the fact that a larger number of ads implies a larger number of variables with a mean close to the maximum expected value, that represents a worst case for \ME~and a best case for \CV. 
+The MSE of \WE~is the lowest in all cases and does not seem to suffer the increasing number of actions. 
+The same happens in Figure~\ref{F:ia_third} when all the ads share the same click rate (0.02), where \CV~is the best.
+However, it starts to have large variance as soon as the range of probabilities increases (Figure \ref{F:variance}). 
+\WE~has the lowest MSE, but, as the range increases, it gets similar to the MSE of \ME.
+
+\begin{figure}[t]
+    \begin{minipage}{\columnwidth}
+    \centering 
+    \setlength\figureheight{4.3cm}
+    \setlength\figurewidth{6cm}
+    \input{imgs/sponsoredSearch.tikz}
+    \caption{Relative player 1 utility gain for different value of the bid defined as $\frac{utility(b)}{utility(v)} - 1$. Results are averaged over 2,000 experiments.}\label{F:spSearch}
+    \end{minipage}
+\end{figure}
+
+\subsubsection{Sponsored Search Auctions}
+We considered the domain described in~\cite{xu2013mab}, where a search engine runs an auction to select the best ad to show from a pool of candidates with the goal of maximizing over a value that depends on the bid of each advertiser and its click probability. 
+Each time an ad is clicked, the search engine charges the advertiser a fee that depends on the bids $b$ of the advertisers and the click through rates (CTRs) $\rho$ of the ads. 
+Since in general the CTRs are unknown, it is crucial for the search engine to estimate from the data which is the best ad (i.e., the one that maximizes $b\cdot\rho$) and the payment in case of click. 
+Wrong estimations may significantly harm the revenue.
+On the other hand, the advertisers have to decide the value of their bid $b_i$ according to the true values $v_i$ of a click. A desirable condition in auctions, called \textit{incentive compatibility}, requires that the advertisers maximize their utility by truthfully bidding $b_i = v_i$. Incentive incompatibility may occur if the estimate of the click probabilities are not accurate, therefore it is interesting to evaluate how the estimators perform on this task.
+We measured the utility gain of advertiser $1$, whose true per click value is $v_1 = 1$, for different bid $b_1$ values and competing with four other advertisers whose bids are $b_{-1} = \lbrace 0.9, 1, 2, 1 \rbrace$. The CTRs are: $\rho = \lbrace 0.15, 0.11, 0.1, 0.05, 0.01 \rbrace$. 
+Following the approach suggested in~\cite{xu2013mab}, CTRs are estimated from data collected using the UCB1 algorithm~\cite{auer2002finite} in a learning phase consisting of $10,000$ rounds of exploration (i.e., impressions).
+% have been learned with the selection debiasing method presented in \citep{xu2013mab} using $\gamma = 1$, UCB1 algorithm to select the ads and $10,000$ rounds of exploration. 
+
+\begin{algorithm}[tb]
+   \caption{Weighted Q-Learning}
+   \label{alg:W Q-Learning}
+\begin{algorithmic}
+   \STATE {\bfseries Initialize} $Q(s, a) = 0$, $means = 0$, $variances = \infty$
+   \REPEAT
+   \STATE Initialize $s$.
+   \REPEAT
+   \STATE Choose action $a$ from state $s$ using policy derived from $Q$ (e.g. $\epsilon$-greedy).
+   \STATE Take action $a$, observe reward $r$ and next state $s'$.
+   \STATE For each action $a' \in \mathbf{a}$ available in state $s'$, consider its mean value $\mu_i$ and variance $\sigma_i^2$.
+   \STATE For all $a_i \in \mathcal{A}$:\\
+   $w_i \leftarrow \int_{-\infty}^{+\infty} \tilde{f}_i^S(s', a_i) \prod_{j\neq i}\tilde{F}_j^S(s', a_j)~\mathrm{d}x$.
+   \STATE $W \gets w^T * Q(s', \mathbf{a})$.
+   \STATE $Q(s, a) \gets Q(s, a) + \alpha[r + \gamma W - Q(s, a)]$.
+   \STATE $s \gets s'$, $a \gets a'$.
+   \UNTIL{$s$ is terminal}
+   \UNTIL
+\end{algorithmic}
+\end{algorithm}
+
+Figure \ref{F:spSearch} shows the utility gain of advertiser $1$ when using \ME, \CV, and \WE.\footnote{The debiasing algorithm proposed in~\cite{xu2013mab} is a cross validation approach, but differs from the estimators considered in this paper. It averages the values used for selection and the values used for estimation, thus being a hybrid of \CV~and \ME.} 
+It can be seen that \ME ~does not achieve incentive compatibility because utility has positive values before the true bid price (which is highlighted with a black vertical bar). On the other hand, with \CV~the advertiser has no incentive to underbid, but there is an incentive to overbid using \CV. With \WE, there is no significant incentive to underbid or overbid showing that it succeeds to achieve incentive compatibility.
+
+\begin{figure*}[t]
+    \begin{minipage}{\textwidth}
+    \centering 
+    \setlength\figureheight{8cm}
+    \setlength\figurewidth{4cm}
+    \subfigure[Bernoulli\label{F:bernoulli}]{\input{imgs/gridexp08-ng.tikz}} 
+    \subfigure[$\mathcal{N}(-1,5)$\label{F:gaussian5}]{\input{imgs/gridexp08-g.tikz}}
+    \subfigure[$\mathcal{N}(-1,1)$\label{F:gaussian1}]{\input{imgs/gridexp08-g-sigma1.tikz}} 
+    \caption{Grid world results with the three reward functions averaged over 10,000 experiments. Performance of the optimal policy is shown with a black line.}\label{F:grid}
+    \end{minipage}
+\end{figure*}
+
+\subsection{Markov Decision Process}
+In the following experiments we compare Q-Learning, Double Q-Learning and a modified version of Q-Learning, that we call \textit{Weighted Q-Learning} (see Algorithm \ref{alg:W Q-Learning}), which uses \WE~to estimate the maximum state-action values.
+Since \WE~computes the probability of each action to be the optimal one, it is quite natural to exploit them to define a policy, that we call \textit{Weighted policy}. 
+At each step, this policy selects an action using the probability estimated by \WE. As we show in the following experiments, the exploration induced by this policy is effective in reducing the estimation error of the value function.
+
+\subsubsection{Grid World}
+We analyzed the performance of the different estimators on a $3 \times 3$ grid world where the start state in the lower-left cell and the goal state in the upper-right cell~\cite{van2010double}. 
+In this domain, we also compared the performance of the Bias-Corrected Q-learning algorithm, a modified version of Q-learning that, assuming Gaussian rewards, corrects the positive bias of ME by subtracting to each Q-value a quantity that depends on the standard deviation of the reward and on the number of actions~\cite{lee2012intelligent,lee2013bias}.
+Learning rate is $\alpha_t(s, a) = \frac{1}{n_t(s, a)^{0.8}}$ where $n_t(s, a)$ is the current number of updates of that state-action value and the discount factor is $\gamma = 0.95$. 
+In Double Q-Learning we use two learning rates $\alpha_t^A(s, a) = \frac{1}{n_t^A(s, a)^{0.8}}$ and $\alpha_t^B(s, a) = \frac{1}{n_t^B(s, a)^{0.8}}$ where $n_t^A(s, a)$ and $n_t^B(s, a)$ are respectively the number of times when table A and table B are updated. 
+We use an $\epsilon$-greedy policy with $\epsilon = \frac{1}{\sqrt{n(s)}}$ where $n(s)$ is the number of times the state $s$ has been visited. 
+For the reward function we consider three different settings: (1) Bernoulli, $-12$ or $10$ randomly at each step, (2) Gaussian with mean $\mu = -1$ and standard deviation $\sigma = 5$, (3) Gaussian with mean $\mu = -1$ and standard deviation $\sigma = 1$. 
+Once in the goal state, each action ends the episode and returns a reward of $5$. Since the optimal policy ends the episode in five actions, the optimal average reward per step is $0.2$. Moreover, the optimal value of the action maximizing the Q value is $5\gamma^4 - \sum_{k=0}^3 \gamma^k \approx 0.36$.
+In Figure \ref{F:grid}, the top plots show the average reward per step obtained by each algorithm and the plots at the bottom show the estimate of the maximum state-action value at the starting state for each algorithm.
+Figures~\ref{F:bernoulli} and~\ref{F:gaussian5} show that when the variance is large with respect to the differences between the means, the underestimation of the Double Q-Learning estimator allows to achieve the best policy faster than other algorithms, even if the approximation of the Q is not accurate as for Weighted Q-Learning. In all settings, Weighted Q-Learning shows much less bias than the other estimators (in particular using the weighted policy). Furthermore, using the weighted policy, achieves the best performance in the case with $\sigma = 1$ (see Figure~\ref{F:gaussian1}). This happens because the weighted policy exploits the good approximation of the Q computed by Weighted Q-Learning and reduces the exploration faster than $\epsilon$ greedy. It is worth to point out that the Gaussian approximation of Q values used by Weighted Q-Learning works well for both Gaussian and Bernoullian rewards, showing that \WE~is effective even with non-Gaussian distribution.
+
+\begin{figure*}[t]
+    \begin{minipage}{\textwidth}
+    \centering 
+    \setlength\figureheight{4.5cm}
+    \setlength\figurewidth{7cm}
+    \subfigure[Train\label{F:forex_train}]{\input{imgs/forexTrain.tikz}} 
+    \subfigure[Test\label{F:forex_test}]{\input{imgs/forexTest.tikz}}
+    \caption{Profit per year during training (left) and test (right) phase. Results are averaged over 100 experiments.}\label{F:forex}
+    \end{minipage}
+\end{figure*}
+
+\subsubsection{Forex}
+Finally, we want to evaluate the performance of the three estimators in a more challenging learning problem.
+Foreign Exchange Market (Forex) is known to be an environment with hardly predictable dynamics. For this reason, it is very difficult to estimate the Q values and, therefore, the expected profit. In real cases it becomes a crucial issue, especially in terms of risk management, to avoid overestimation or underestimation of the Q value of a state-action pair.
+To better evaluate the results we defined a more basic environment compared to the real market. 
+In our Forex MDP the agent enters in the market always with 1\$ and each time the agent enters on long or short position a fixed spread value of 0.0002\$ is paid.
+The possible actions taken from the agent can be -1, 0 or 1, which mean respectively 'enter on a short position', 'close a position' and 'enter on long position'.
+As state space we consider the suggestions (in terms of actions) provided by 7 common Forex indicators (more details can be found in the appendix) and the action chosen by the agent at the previous time step.
+% The states are defined by 7 actions suggested by the interpretation of the values of 7 common Forex indicators (more details can be found in the appendix) and from the previous action chosen by the agent.
+The state space is $S = \lbrace -1, 0, 1 \rbrace ^8$ with $s_{i = 1...7}(t) = \lbrace -1, 0, 1 \rbrace$ and $s_8(t) = a(t - 1)$.
+The action taken by the agent is $a(t) = \lbrace -1, 0, 1 \rbrace$.
+The reward $r(t)$ is a function of the previous and current action chosen and of the difference between the current closing price $c(t)$ and the previous closing price $c(t - 1)$:
+$$r(t) = a(t - 1)(c(t) - c(t - 1)) + 0.5 * spread |a(t) - a(t - 1)|.$$
+The same four algorithms used in the grid world domain were trained using historical daily data of GBP/USD exchange rate from 09/22/1997 to 01/10/2005 and tested on data from 01/11/2005 to 05/27/08. 
+During the training phase, the learning rate was set to $\frac{1}{n(s, a)}$, the discount factor to 0.8 and the epsilon was set to $\frac{1}{\sqrt{n(s)}}$.
+
+In Figure \ref{F:forex} is shown the profit per year of the four algorithms on the training set (Figure~\ref{F:forex_train}) and test set (Figure~\ref{F:forex_test}) in relation to the number of training episodes. In this training phase an $\epsilon$-greedy policy is used for Q-learning and Double Q-Learning, while Weighted Q-Learning has been done with both the $\epsilon$-greedy policy and the weighted policy.
+During training, Q-learning performs better than Double Q-learning and also than Weighted Q-learning. Weighted Q-learning with the Weighted policy has the worst performance on the training set, but it performs significantly better on the test set. This is because the Weighted policy is more explorative than the $\epsilon$-greedy policy, so the performance can be worse during the training phase, but the estimation of the Q values is more accurate.
+Double Q-learning performs worse than Q-learning and Weighted Q-learning both on training set and test set. 
+The reason is that in many states there is an action that is significantly better than the others, that represents the case where \ME~gives the best results, while \CV~suffers.
+% This is not just because Double Q-learning uses two different estimators, in other words less data, but also because in this MDP, unlike what happens in the grid world experiment, an underestimation of Q value can be more disadvantageous than an overestimation. In fact  underestimation can bring the agent to have a more conservative behavior, choosing the 'close position' action to avoid spread costs more often than in Q or Weighted Q-learning because it becomes more difficult to individuate the best action.

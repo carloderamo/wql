@@ -1,0 +1,25 @@
+\section{The Proposed Method}\label{S:Method}
+
+Differently from \ME~and \CV~estimators that output the sample average of the variable that is estimated to be the one with the largest mean, we propose to estimate the maximum expected value $\mu_*(X)$ with the \emph{Weighted Estimator} (\WE) that computes a weighted mean of all the sample averages:
+\begin{equation*}\label{E:WE}
+\est{\WE}(S) = \sum_{i=1}^M \hat\mu_i(S) w_i^S.
+\end{equation*}
+Ideally, each weight $w_i^S$ should be the probability of $\hat\mu_i(S)$ being larger than all other samples means:  
+$$w_i^S = P\left(\hat\mu_i(S) = \max_j \hat\mu_j(S)\right).$$
+If we knew the PDFs $\hat{f}_i^S$ for each $\hat\mu_i(S)$ we could compute the \emph{Optimal Weight Estimator} (OWE):
+\begin{equation}\label{E:OptimalWE}
+\est{\OWE}(S) = \sum_{i=1}^M \hat\mu_i(S)\int_{-\infty}^{+\infty} \hat{f}_i^S(x) \prod_{j\neq i}\hat{F}_j^S(x)~\mathrm{d}x.
+\end{equation}
+We know that the sample mean $\hat\mu_i(S)$ is a random variable whose expected value is $\mu_i$ and whose variance is $\frac{\sigma^2_i}{|S_i|}$.
+Unfortunately, its PDF $\hat f_i^S$ depends on the PDF $f_i$ of variable $X_i$ that is assumed to be unknown.
+In particular, if $X_i$ is normally distributed, then, independently from the sample size, the sampling distribution of its sample mean is normal too: $\hat\mu_i(S)\sim\mathcal{N}\left(\mu_i,\frac{\sigma_i^2}{|S_i|}\right)$.
+On the other hand, by the central limit theorem, the sampling distribution $\hat f_i^S$ of the sample mean $\hat\mu_i(S)$ approaches the normal distribution as the number of samples $|S_i|$ increases, independently from the distribution of $X_i$.
+Leveraging on these considerations, we propose to approximate the distribution of the sample mean $\hat\mu_i(S)$ with a normal distribution, where we replace the population mean and variance of variable $X_i$ with their (unbiased) sample estimates:
+$$\hat f_i^S \approx \tilde f_i^S = \mathcal{N}\left(\hat\mu_i(S),\frac{\hat\sigma^2_i(S)}{|S_i|}\right),$$
+so that the \WE~estimator is computed as:
+\begin{equation}\label{E:WE2}
+\est{\WE}(S) = \sum_{i=1}^M \hat\mu_i(S)\int_{-\infty}^{+\infty} \tilde{f}_i^S(x) \prod_{j\neq i}\tilde{F}_j^S(x)~\mathrm{d}x.
+\end{equation}
+
+It is worth noting that the \WE~estimator is consistent with $\mu_*(X)$. In fact, as the number of samples grows to infinity, each sample mean $\hat\mu_i$ converges to the related population mean $\mu_i$, and the variance of the normal distribution $\tilde f_i$ tends to zero, so that the weights of the variables with expected value less than $\mu_*(X)$ go to zero, so that $\est{\WE} \rightarrow \mu_*(X)$.
+

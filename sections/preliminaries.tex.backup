@@ -1,0 +1,37 @@
+\section{Preliminaries}\label{S:Preliminaries}
+
+\textbf{Problem definition} We consider the problem of finding the maximum expected value of a finite set of $M \geq 2$ independent random variables $X = \lbrace X_{1}, ..., X_{M} \rbrace$.
+We denote with $f_i : \mathbb{R} \rightarrow \mathbb{R}$ the probability density function (PDF), with $F_i : \mathbb{R} \rightarrow \mathbb{R}$ the cumulative density function (CDF), with $\mu_i$ the mean, and with $\sigma^2_i$ the variance of variable $X_i$.
+The maximum expected value $\mu_{*}(X)$ is defined as
+\begin{align}\label{eq:maxExp}
+\mu_{*}(X) = \max_{i} \mu_{i} = \max_{i} \int_{-\infty}^{+\infty}xf_i(x)~\mathrm{d}x.
+\end{align}
+Assuming that the PDFs are unknown, $\mu_{*}(X)$ cannot be found analytically.
+Given a set of noisy samples $S = \lbrace S_{1}, ..., S_{N} \rbrace$ retrieved by the unknown distributions of each $X_{i}$, we are interested in founding an accurate estimator $\est{}(S) \approx \mu_{*}(X)$.
+% and we want to estimate it from a set of noisy samples $S$ retrieved by the unknown distributions of each $X_{i}$.
+% The estimation of the maximum expected value of a finite set of $N \geq 2$ independent random variables $X = \lbrace X_{1}, ..., X_{N} \rbrace$ with means $\mu_{1}, ..., \mu_{N}$ and variances $\sigma^2_{1}, ..., \sigma^2_{N}$ requires a set of noisy samples $S$ retrieved by the unknown distributions of each $X_{i}$. 
+% and can be approximated with an estimate $\hat{\mu}_{*}(S) \approx \mu_{*}(X)$ using the given noisy samples in $S = \lbrace S_{1}, ..., S_{N} \rbrace$. 
+These random samples have means $\hat{\mu}_{1}, ..., \hat{\mu}_{N}$ that are unbiased estimators of the true mean $\mu_{i}$, since each sample $s\in S_{i}$ is an unbiased estimate for $\mu_{i}$.
+
+\textbf{Related works} One way to estimate the maximum expected value is to approximate it with the maximum of the sample means:
+\begin{equation}
+\est{\ME}(S) = \max_{i}\hat{\mu}_{i}(S) \approx \mu_{*}(X).
+\end{equation}
+This method is called \textit{Maximum Estimator} (ME) and it is used, for instance, by Q-Learning to approximate the value of the following state by maximizing over the estimated action values in that state. Unfortunately, as proved in \cite{dhariyal85}, this estimator is positively biased and this is critical in Q-Learning where the approximation error can increase step by step due to the continuous overestimation of the true state-action values. To understand the presence of this positive bias, consider the CDF $F^{\hat\mu}_{\max}(x)$ of the maximal estimator $\max_{i}\hat\mu_{i}$ which is the probability that the maximum estimate is less than or equal to $x$. This probability is equal to the probability that all other estimates are less than or equal to $x$: $\hat F_{\max}(x) = P(\max_{i}\hat\mu_{i} \leq x) = \prod^M_{i=1} P(\hat\mu_{i} \leq x) = \prod^M_{i=1} \hat F_i(x)$. Considering the PDF $\hat f_{\max}$, the expected value of the maximum estimator is $E [ \max_{i}\hat\mu_{i} ] = \int^{\infty}_{-\infty} x \hat f_{\max}(x) dx$. This is equal to
+\begin{align}
+E \left[ \max_{i} \hat\mu_{i} \right] &= \int^{\infty}_{-\infty} x \frac{d}{dx} \prod^M_{j=1} \hat F_j(x)~\mathrm{d}x \nonumber \\ 
+&=\sum^M_i \int^{\infty}_{-\infty} x \hat f_i(s) \prod^M_{i \neq j} \hat F_j(x)~\mathrm{d}x.
+\end{align}
+However this is the expected value of the ME, not the maximum expected value of Equation \eqref{eq:maxExp}. This is the reason why the single estimator $max_i\hat\mu_i(S)$ is a positively biased estimate for $max_i E [ X_i ]$.
+
+In order to avoid this issue, an alternative method, called \textit{Cross Validation Estimator}, has been proposed in \cite{van2013estimating}. In this technique, like in the case of the maximum estimator, a sample set $S$ retrieved by the true unknown distribution is used, but in this case it is divided in two disjoint subsets $S^A = \lbrace S^A_{1}, ..., S^A_{N} \rbrace$ and $S^B = \lbrace S^B_{1}, ..., S^B_{N} \rbrace$. If the sets are split in a proper way, for instance randomly, the sample means $\hat{\mu}^A_{i}$ and $\hat{\mu}^B_{i}$ are unbiased, like the means $\hat{\mu}_{i}$ in the case of the single estimator. An estimator $a^*$, such that $\mu^A_{a^*}(X) = \max_{i}\mu^A_{i}(X)$, is used to pick an estimator $\mu^B_{a^*}$ that is an estimate for $\max_{i}E [ \mu^B_{i} ]$ and for $\max_{i}E [ X_{i} ]$. Obviously, this can be done the opposite way, using an estimator $b^*$ to retrieve the estimator value $\hat{\mu}^A_{b^*}$. The bias of CV estimator can be found in the same way as for the ME with
+\begin{equation}
+\sum^M_i E \left[ \mu^B_i \right] \int^{\infty}_{-\infty} f^A_i(x) \prod^M_{j \neq i} F^A_j(x)~\mathrm{d}x
+\end{equation}
+when using an estimator $a^*$, and
+\begin{equation}
+\sum^M_i E \left[ \mu^A_i \right] \int^{\infty}_{-\infty} f^B_i(x) \prod^M_{j \neq i} F^B_j(x)~\mathrm{d}x
+\end{equation}
+using an estimator $b^*$.
+This formula can be seen as a weighted sum of the expected values of the random variables where the weights are the probabilities of each variable to be the maximum. Since these probabilities sum to one, the approximation given by the CV estimator results to a value that is lower or equal to the maximal expected value. Obviously, the underestimation does not guarantee better estimation than the ME, but can be helpful to avoid an incremental approximation error in some applications. For instance, Double Q-Learning \cite{van2010double} is a variation of Q-Learning that exploits this technique to avoid the previously described issues due to overestimation. Indeed, Double Q-Learning has been tested in some very noisy environments and succeeded to find better policies than Q-Learning. Double Q-Learning has been applied also in the field of Deep Reinforcement Learning as a modification of the widely known DQN model  \cite{van2015deep}.
+Another remarkable application of the CV Estimator is presented in \cite{xu2013mab} where it achieves better result than the ME in a sponsored search auctions problem.

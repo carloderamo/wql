@@ -1,0 +1,42 @@
+\section{Preliminaries}\label{S:Preliminaries}
+
+\textbf{Problem definition} We consider the problem of finding the maximum expected value of a finite set of $M \geq 2$ independent random variables $X = \lbrace X_{1}, ..., X_{M} \rbrace$.
+We denote with $f_i : \mathbb{R} \rightarrow \mathbb{R}$ the probability density function (PDF), with $F_i : \mathbb{R} \rightarrow \mathbb{R}$ the cumulative density function (CDF), with $\mu_i$ the mean, and with $\sigma^2_i$ the variance of variable $X_i$.
+The maximum expected value $\mu_{*}(X)$ is defined as
+\begin{align}\label{eq:maxExp}
+\mu_{*}(X) = \max_{i} \mu_{i} = \max_{i} \int_{-\infty}^{+\infty}xf_i(x)~\mathrm{d}x.
+\end{align}
+Assuming that the PDFs are unknown, $\mu_{*}(X)$ cannot be found analytically.
+Given a set of noisy samples $S = \lbrace S_{1}, ..., S_{N} \rbrace$ retrieved by the unknown distributions of each $X_{i}$, we are interested in finding an accurate estimator $\est{}(S) \approx \mu_{*}(X)$.
+% and we want to estimate it from a set of noisy samples $S$ retrieved by the unknown distributions of each $X_{i}$.
+% The estimation of the maximum expected value of a finite set of $N \geq 2$ independent random variables $X = \lbrace X_{1}, ..., X_{N} \rbrace$ with means $\mu_{1}, ..., \mu_{N}$ and variances $\sigma^2_{1}, ..., \sigma^2_{N}$ requires a set of noisy samples $S$ retrieved by the unknown distributions of each $X_{i}$. 
+% and can be approximated with an estimate $\hat{\mu}_{*}(S) \approx \mu_{*}(X)$ using the given noisy samples in $S = \lbrace S_{1}, ..., S_{N} \rbrace$. 
+These random samples have means $\hat{\mu}_{1}, ..., \hat{\mu}_{N}$ that are unbiased estimators of the true mean $\mu_{i}$.
+% , since each sample $s\in S_{i}$ is an unbiased estimate for $\mu_{i}$.
+The PDF and CDF of $\hat{\mu}_{i}(S)$ are denoted by $\hat f_i^S$ and $\hat F_i^S$.
+
+\textbf{Related works} The maximum expected value can be approximated with the maximum of the sample means:
+\begin{equation}\label{E:biasME}
+\est{\ME}(S) = \max_{i}\hat{\mu}_{i}(S) \approx \mu_{*}(X).
+\end{equation}
+This method is called \textit{Maximum Estimator} (\ME) and it is used, for instance, by Q-Learning to approximate the value of the following state by maximizing over the estimated action values in that state. Unfortunately, as proved in \cite{smith2006optimizer}, this estimator is positively biased and this is critical in Q-Learning where the approximation error can increase step by step due to the overestimation of the state-action values. To understand the presence of this positive bias, consider the CDF $\hat{F}_{\max}(x)$ of the maximal estimator $\max_{i}\hat\mu_{i}$ that is the probability that ME is less than or equal to $x$. This probability is equal to the probability that all other estimates are less than or equal to $x$: $\hat F_{\max}(x) = P(\max_{i}\hat\mu_{i} \leq x) = \prod^M_{i=1} P(\hat\mu_{i} \leq x) = \prod^M_{i=1} \hat F_i(x)$. Considering the PDF $\hat f_{\max}$, the expected value of the maximum estimator is $E\left[\est{\ME}\right] = E [ \max_{i}\hat\mu_{i} ] = \int^{\infty}_{-\infty} x \hat f_{\max}(x) dx$. This is equal to
+\begin{align}
+E\left[\est{\ME}\right] &= \int^{\infty}_{-\infty} x \frac{d}{dx} \prod^M_{j=1} \hat F_j(x)~\mathrm{d}x \nonumber \\ 
+&=\sum^M_i \int^{\infty}_{-\infty} x \hat f_i(x) \prod^M_{i \neq j} \hat F_j(x)~\mathrm{d}x.
+\end{align}
+However, this is the expected value of the ME, not the maximum expected value in~\eqref{eq:maxExp}. The positive bias can be explained by the presence of $x$ in the integral which correlates with the monotonically increasing product $\prod^M_{i \neq j} \hat F_j(x)$.
+
+In order to avoid this issue, an alternative method, called \textit{Double Estimator} (\CV), has been proposed in \cite{van2010double} and theoretically analyzed in~\cite{van2013estimating}. In this technique, like in the case of the maximum estimator, a sample set $S$ retrieved by the true unknown distribution is used, but in this case it is divided in two disjoint subsets $S^A = \lbrace S^A_{1}, ..., S^A_{N} \rbrace$ and $S^B = \lbrace S^B_{1}, ..., S^B_{N} \rbrace$. If the sets are split in a proper way, for instance randomly, the sample means $\hat{\mu}^A_{i}$ and $\hat{\mu}^B_{i}$ are unbiased, like the means $\hat{\mu}_{i}$ in the case of the single estimator. An estimator $a^*$, such that $\hat\mu^A_{a^*}(X) = \max_{i}\hat\mu^A_{i}(X)$, is used to pick an estimator $\hat\mu^B_{a^*}$ that is an estimate for $\max_{i}E [ \hat\mu^B_{i} ]$ and for $\max_{i}E [ X_{i} ]$. Obviously, this can be done the opposite way, using an estimator $b^*$ to retrieve the estimator value $\hat{\mu}^A_{b^*}$. 
+\CV~takes the average of these two estimators.
+The bias of \CV~can be found in the same way as for \ME~with
+\begin{equation}\label{E:biasCV}
+E\left[\est{\CV}\right]=\sum^M_i E \left[ \hat\mu^B_i \right] \int^{\infty}_{-\infty} \hat f^A_i(x) \prod^M_{j \neq i} \hat F^A_j(x)~\mathrm{d}x
+\end{equation}
+when using an estimator $a^*$ (the same holds by swapping A and B).
+% , and
+% \begin{equation}
+% \sum^M_i E \left[ \hat\mu^A_i \right] \int^{\infty}_{-\infty} \hat f^B_i(x) \prod^M_{j \neq i} \hat F^B_j(x)~\mathrm{d}x
+% \end{equation}
+% using an estimator $b^*$.
+This formula can be seen as a weighted sum of the expected values of the random variables where the weights are the probabilities of each variable to be the maximum. Since these probabilities sum to one, the approximation given by \CV~results in a value that is lower than or equal to the maximal expected value. Even if the underestimation does not guarantee better estimation than the \ME, it can be helpful to avoid an incremental approximation error in some learning problems. For instance, Double Q-Learning \cite{van2010double} is a variation of Q-Learning that exploits this technique to avoid the previously described issues due to overestimation. Double Q-Learning has been tested in some very noisy environments and succeeded to find better policies than Q-Learning. Double Q-Learning has been applied also in the field of Deep Reinforcement Learning as a modification of the widely known DQN model  \cite{van2015deep}.
+Another remarkable application of \CV~is presented in \cite{xu2013mab} where it achieves better results than \ME~in a sponsored search auction problem.

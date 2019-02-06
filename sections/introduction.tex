@@ -1,0 +1,29 @@
+\section{Introduction}\label{S:Introduction}
+In many machine learning problems it is necessary to estimate the \emph{maximum expected value} (\MEV) of a set of random variables, given samples collected from each variable~\cite{van2013estimating}.
+For instance, in reinforcement learning, the optimal policy can be found by taking, in each state, the action that attains the maximum expected cumulative reward.
+The optimal value of an action in a state, on its turn, depends on the maximum expected values of the actions available in the reached states.
+Since errors propagate through all the state-action pairs, a bad estimator for the maximum expected value negatively affects the speed of learning~\cite{van2010double}.
+Another example of the importance of producing accurate estimates for the maximum expected value is provided by sponsored search auctions, where the search engine needs to select which ad to show from a pool of candidates.
+To select the best ad, usually, one needs to estimate the probability that a random user will click on it.
+Since, each time an ad is clicked, the search engine charges to the advertiser a fee that depends on the click probabilities of the top two ads, a good estimate of the maximum expected value is essential to maximize the revenue of the search engine~\cite{xu2013mab}.
+
+The most common estimator is the \emph{Maximum Estimator} (ME), which consists of taking the maximum of the sample means.
+It is well known~\cite{smith2006optimizer,van2004rational,van2010double} that ME overestimates the maximum expected value.
+To avoid such positive bias, a common approach is the \emph{Double Estimator} (\CV), that consists in a \emph{cross-validatory} approach where the sample set is split into two sample sets $A$ and $B$~\cite{stone1974cross}. \CV~results from the average of two estimates.
+For the first estimate, the sample set $A$ is used to determine which is the variable with the largest mean, while sample set $B$ is used to estimate the value of the variable.
+The second estimate is obtained by switching the roles of $A$ and $B$.
+Although the absolute bias of CV can be larger than the one of ME~\cite{van2013estimating}, CV is negatively biased and this can be an advantage in some applications~\cite{van2010double,xu2013mab,van2015deep}.
+Unfortunately, an unbiased estimator for the maximum expected value \emph{does not exist} for many common distributions (e.g., Gaussian, Binomial, and Beta)~\cite{blumenthal1968estimation,dhariyal85}.
+On the other hand, having an unbiased estimator does not entail a small expected Mean Squared Error (MSE), since also the variance of the estimator has to be considered.
+
+In this paper we propose to estimate the maximum expected value using the \emph{Weighted Estimator} (\WE), that consists of a weighted average of the sample means, where the weights are obtained by estimating the probability that each variable has the largest expected value.
+To compute such probabilities we would need to know the distributions of the sample means.
+Relying on the central limit theorem, we approximate the distributions of the samples means with Gaussian distributions parameterized by the sample mean and sample variance.
+Such weighting mechanism reduces the bias w.r.t. \ME~without increasing the variance as \CV~does.
+The \emph{original contributions} are: (1) the introduction of the \WE~estimator, (2) a theoretical analysis of the bias and the variance of the estimation error, (3) an extensive empirical analysis that compares \ME, \CV, \WE~when used for learning in sequential decision problems.
+
+The rest of the paper is organized as follows.
+In the next section we introduce the basic notation and discuss the most related works.
+Section~\ref{S:Method} contains the description of the proposed approach, whose theoretical properties are presented in Section~\ref{S:Analysis}.
+In Section~\ref{S:Experiments}, we show the empirical results where \WE~is compared with the state of the art.
+Section~\ref{S:Conclusions} draws conclusions and discusses future work.

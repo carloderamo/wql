@@ -1,0 +1,78 @@
+\begin{thebibliography}{12}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Auer et~al.(2002)Auer, Cesa-Bianchi, and Fischer]{auer2002finite}
+Auer, Peter, Cesa-Bianchi, Nicolo, and Fischer, Paul.
+\newblock Finite-time analysis of the multiarmed bandit problem.
+\newblock \emph{Machine learning}, 47\penalty0 (2-3):\penalty0 235--256, 2002.
+
+\bibitem[Blumenthal \& Cohen(1968)Blumenthal and
+  Cohen]{blumenthal1968estimation}
+Blumenthal, Saul and Cohen, Arthur.
+\newblock Estimation of the larger of two normal means.
+\newblock \emph{Journal of the American Statistical Association}, 63\penalty0
+  (323):\penalty0 861--876, 1968.
+
+\bibitem[Dhariyal et~al.(1985)Dhariyal, Sharma, and Krishnamoorthy]{dhariyal85}
+Dhariyal, I., Sharma, D., and Krishnamoorthy, K.
+\newblock Nonexistence of unbiased estimators of ordered parameters.
+\newblock \emph{Statistics}, 1985.
+
+\bibitem[Lee et~al.(2013)Lee, Defourny, and Powell]{lee2013bias}
+Lee, Daewoo, Defourny, Boris, and Powell, Warren~B.
+\newblock Bias-corrected q-learning to control max-operator bias in q-learning.
+\newblock In \emph{Adaptive Dynamic Programming And Reinforcement Learning
+  (ADPRL), 2013 IEEE Symposium on}, pp.\  93--99. IEEE, 2013.
+
+\bibitem[Lee \& Powell(2012)Lee and Powell]{lee2012intelligent}
+Lee, Donghun and Powell, Warren~B.
+\newblock An intelligent battery controller using bias-corrected q-learning.
+\newblock In \emph{AAAI}. Citeseer, 2012.
+
+\bibitem[Smith \& Winkler(2006)Smith and Winkler]{smith2006optimizer}
+Smith, James~E and Winkler, Robert~L.
+\newblock The optimizer's curse: Skepticism and postdecision surprise in
+  decision analysis.
+\newblock \emph{Management Science}, 52\penalty0 (3):\penalty0 311--322, 2006.
+
+\bibitem[Stone(1974)]{stone1974cross}
+Stone, Mervyn.
+\newblock Cross-validatory choice and assessment of statistical predictions.
+\newblock \emph{Journal of the royal statistical society. Series B
+  (Methodological)}, pp.\  111--147, 1974.
+
+\bibitem[Van~den Steen(2004)]{van2004rational}
+Van~den Steen, Eric.
+\newblock Rational overoptimism (and other biases).
+\newblock \emph{American Economic Review}, pp.\  1141--1151, 2004.
+
+\bibitem[van Hasselt(2010)]{van2010double}
+van Hasselt, Hado.
+\newblock Double q-learning.
+\newblock In \emph{Advances in Neural Information Processing Systems}, pp.\
+  2613--2621, 2010.
+
+\bibitem[van Hasselt(2013)]{van2013estimating}
+van Hasselt, Hado.
+\newblock Estimating the maximum expected value: an analysis of (nested)
+  cross-validation and the maximum sample average.
+\newblock \emph{arXiv preprint arXiv:1302.7175}, 2013.
+
+\bibitem[van Hasselt et~al.(2015)van Hasselt, Arthur, and David]{van2015deep}
+van Hasselt, Hado, Arthur, Guez, and David, Silver.
+\newblock Deep reinforcement learning with double q-learning.
+\newblock \emph{CoRR}, abs/1509.06461, 2015.
+\newblock URL \url{http://arxiv.org/abs/1509.06461}.
+
+\bibitem[Xu et~al.(2013)Xu, Qin, and Liu]{xu2013mab}
+Xu, Min, Qin, Tao, and Liu, Tie-Yan.
+\newblock Estimation bias in multi-armed bandit algorithms for search
+  advertising.
+\newblock In \emph{Advances in Neural Information Processing Systems}, pp.\
+  2400--2408, 2013.
+
+\end{thebibliography}

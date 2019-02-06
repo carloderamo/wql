@@ -1,0 +1,40 @@
+\section{Proofs}\label{A:Proofs}
+
+\section{Experiments}\label{A:Experiments}
+
+\subsection{Forex}\label{A:Forex}
+The indicators choosen to define the states are: Moving Average Convergence/Divergence indicator, Relative Strenght Index, Momentum, Channel Commodity Index, Stochastic Oscillator, Bollinger Bands, Moving Average Cross-Over
+The actions suggested by the indicators are computed by setting the parameters and the entry-exit conditions following the most used and common rules for these indicators.
+In particular all the signals are defined using implemented Matlab Financial Toolbox functions and setting parameter and conditions like below.
+
+- Moving Average Covergence/Divergence indicator:
+The MACD is calculated by subtracting the 26-period exponential moving average from the 12-period moving average. A 9 period exponential moving average is used as signal line.
+When the MACD falls below the signal line a long position signal is produced.
+Otherwise if the MACD surpasses the signal line a short position signal is produced.
+
+-Relative Strenght Index:
+The period choosen for the RSI is 20 days.
+When the RSI is under the value of 30 an oversold market condition occurs, so a long position signal is produced.
+Similarly, when the RSI is over 70, a short position signal is generated.
+When the value is between these two bounds a close position signal is produced.
+
+-Momentum
+The momentum use a period of 14 days. The strategy is to be “always in the market”. In particular if the value of the momentum is less than zero a long position signal is generated. Otherwise  a short position signal is generated.
+
+-Channel Commodity Index
+The CCI is used with a 20 days period. The long position signal is produced when the cci cross and surpasses the lower bound of -100. The short position is taken when the CCI falls behind the value of 100. Otherwise the close position signal is generated.
+
+-Stochastic Oscillator
+The Stochastic oscillator use the high prices, low prices, and close prices with a 14 days period for the \%K line and 3  for the \%D line.
+If both lines are above the value of 80 and the \%K line falls behind \%D line, then a short position signal is generated.
+If both lines are below 20 and the \%K line surpass the \%D line, a long position signal is generated. In other conditions a “close position signal” is generated.
+
+-Bollinger Bands
+The bollinger bands signal is produced with a window size of 20.
+“Long position” signal is produced when the closing price surpasses the upper bollinger band.
+When the closing price falls down the lower band, then a “short position” signal is taken.
+Otherwise a “close position signal” is generated.
+
+-Moving Average Cross-Over
+We used two moving average of 20 and 200 periods. A  long position signal is produced when the 20 period moving average falls behind the 200 periods one. Otherwise a “short position” signal is generated.
+

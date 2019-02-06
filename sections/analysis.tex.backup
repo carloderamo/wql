@@ -1,0 +1,136 @@
+\section{Theoretical Analysis}\label{S:Analysis}
+
+In this section, we theoretically analyze the estimation error of $\est{\WE}(S)$ in terms of bias and variance, comparing it with the results available for the \ME~and \CV~estimators.
+Although \OWE~is not a practical estimator, we include it in the following analysis since it is easier to analyze and it can be used to bound the potentiality of \WE.
+
+\subsection{Bias}
+
+\begin{figure*}[t]
+    \begin{minipage}{0.45\textwidth}
+    \centering 
+    \setlength\figureheight{4cm}
+    \setlength\figurewidth{6cm}
+    \input{imgs/bias.tikz} 
+    \caption{Comparison of the bias of the different estimators.}\label{F:bias}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.54\textwidth}    
+    \centering 
+    \setlength\figureheight{4cm}
+    \setlength\figurewidth{6cm}
+    \input{imgs/absolute_bias.tikz} 
+    \caption{Comparison of the absolute bias of the different estimators.}\label{F:absolute_bias}
+    \end{minipage}
+\end{figure*}
+
+We start with summarizing the main results about the bias of the \ME~and \CV~estimators reported in~\cite{van2013estimating}.
+For what concerns the direction of the bias, the \ME~estimator is positively biased, while the \CV~estimator is negatively biased.
+If we look at the absolute bias, there is no a clear winner. 
+For instance, when all the random variables are identically distributed the \CV~estimator is unbiased, while it represents a worst case for the \ME~estimator.
+On the other hand, when the maximum expected value is sufficiently larger than the expected values of the other variables, the absolute bias of the \ME~estimator can be significantly smaller than the one of \CV~(see Section~\ref{S:Experiments}).
+The bias of the \ME~estimator is bounded by:
+$$\mathrm{Bias}\left(\est{\ME}\right) \leq \sqrt{\frac{M-1}{M}\sum_{i=1}^M \frac{\sigma_i^2}{|S_i|}}.$$
+For the bias of \CV, \citet{van2013estimating} conjectures the following bound (which is proved for two variables):
+$$\mathrm{Bias}\left(\est{\CV}\right) \geq -\frac{1}{2}\left(\sqrt{\sum_{i=1}^M \frac{\sigma_i^2}{|S^A_i|}} + \sqrt{\sum_{i=1}^M \frac{\sigma_i^2}{|S^B_i|}}\right). $$
+
+In the next theorem we provide a relationship between the bias of \WE~and the one of \ME.
+\begin{theorem}\label{T:BiasWEME}
+ For any given set $X$ of $M$ random variables:
+ $$\mathrm{Bias}(\est{\WE}) \leq \mathrm{Bias}(\est{\ME}) \leq \sqrt{\frac{M-1}{M}\sum_{i=1}^M \frac{\sigma_i^2}{|S_i|}}.$$
+\end{theorem}
+\begin{proof}
+The proof of Theorem~\ref{T:BiasWEME} follows directly from observing that $\est{\WE}$ is always smaller than $\est{\ME}$. In fact, the \ME~estimator can be seen as a weighted estimator that gives probability one to the variable associated to the largest sample mean $\hat\mu_i$, so that any other weighting cannot produce a larger value. 
+\end{proof}
+As we will see in Section~\ref{S:Experiments}, this does not mean that the absolute bias of \WE~is necessarily smaller than the one of \ME.
+In order to establish a relationship between the bias of \WE~and the one of \CV, we introduce the following lemma.
+\begin{lemma}\label{L:BiasOWECV}
+ For any given set $X$ of $M$ random variables:
+ $$0 \leq \mathrm{Bias}(\est{\OWE}) \leq \mathrm{Bias}(\est{\CV}).$$
+\end{lemma}
+\begin{proof}
+ DIMOSTRARE CHE IL BIAS DI $\OWE$ E' NEGATIVO (SIMILE ALLA DIMOSTRAZIONE DI \CV)
+ DIMOSTRARE CHE IL BIAS DI $\OWE$ E' INFERIORE A QUELLO DI \CV (MENO INCERTEZZA SULLE DISTRIBUZIONI)
+\end{proof}
+Leveraging on the above lemma, it is easy to put in relationship the bias of \WE~with the one of \CV.
+\begin{theorem}\label{T:BiasWECV}
+ For any given set $X$ of $M$ random variables:
+  $$\mathrm{Bias}(\est{\WE}) \geq \mathrm{Bias}(\est{\CV}).$$
+\end{theorem}
+\begin{proof}
+ The proof follows by showing that the bias of \WE~is never lower than the one of \OWE.
+ This fact combined with the inequality in Lemma~\ref{L:BiasOWECV} completes the proof.
+\end{proof}
+
+
+
+
+In Figures~\ref{F:bias} and~\ref{F:absolute_bias} we visualize the bias of the different maximum expected value estimators in a setting with two normally distributed random variables ($X_1\sim\mathcal{N}(\mu_1,\sigma_1^2)$ and $X_2\sim\mathcal{N}(\mu_1,\sigma_2^2)$) as a function of the difference of their expected values. Both variables have variance equal to 10 ($\sigma_1^2=\sigma_2^2=10$) and we assume to have 100 samples for each variable ($|S_1|=|S_2|=100$).
+Figure~\ref{F:bias} confirms the previous theoretical analysis: the bias of \ME~is always positive, while the biases of \OWE~and \CV~are always negative, with the latter always worse than the former.
+The bias of \WE~can be positive or negative according to the situation, but it always falls in the range identified by the biases of \ME~and \CV. (DAGLI ESPERIMENTI WE SEMBRA ANDARE SOTTO OWE, CONTRADICENDO IL TEOREMA!!!)
+Looking at the absolute biases shown in Figure~\ref{F:absolute_bias}, we can notice that there is no a clear winner.
+AS previously mentioned, when the variables have the same mean, both \CV~and \OWE are unbiased, while it represents a worst case for the bias of \ME~and \WE. It follows that, when the difference of the two means is small (less than 0.5 in the example), \CV suffers less absolute bias than \ME~and \WE. For moderate differences of the means (between 0.5 and 1.8 in the example), \WE~has the minimum absolute bias, while \ME~is preferable for larger differences.
+Such results can be generalized as follows: \CV~suffers small bias when there are several variables that have expected values close (w.r.t.~their variances) to the maximum one, while \ME~provides the best estimate when there is one variable whose expected value is significantly larger (w.r.t.~the variances) than all the ones of all the other variables. In all the other cases, \WE~is less biased.
+
+\subsection{Variance}
+
+We cannot evaluate the goodness of an estimator by analyzing only its bias.
+In fact, since the MSE of an estimator is the sum of its squared bias and its variance, we need to take into consideration also the latter.
+
+\citet{van2013estimating} proved that both the variance of \ME~and the one of \CV~can be upper bounded with the sum of the variances of the sample means:
+$ \mathrm{Var}\left(\est{\ME}\right) \leq \sum_{i=1}^M \frac{\sigma^2_i}{|S_i|}$, $\mathrm{Var}\left(\est{\CV}\right) \leq \sum_{i=1}^M \frac{\sigma^2_i}{|S_i|}$.
+The following theorem shows that the same upper bound holds also for the variance of \WE.
+\begin{theorem}\label{T:Variance}
+ The variance of \WE~is upper bounded by
+ $$\mathrm{Var}\left(\est{\WE}\right) \leq \sum_{i=1}^M \frac{\sigma^2_i}{|S_i|}.$$
+\end{theorem}
+\begin{proof}
+ Starting from the definition of \WE~\eqref{E:WE}, we can derive the bound to the variance as follows
+ \begin{align*}
+  \mathrm{Var}\left(\est{\WE}\right) &= \mathrm{Var}\left(\sum_{i=1}^M \hat\mu_i(S) w_i^S\right)\\
+  &\leq \mathrm{Var}\left(\sum_{i=1}^M \hat\mu_i(S)\right)\\
+  &= \sum_{i=1}^M \mathrm{Var}\left(\hat\mu_i(S)\right),
+ \end{align*}
+ where the inequality is a consequence of the maximization of each weight $w_i^S$ with one and the last equality comes from the independence of the sample means.
+\end{proof}
+The bound in Theorem~\ref{T:Variance} is overly pessimistic; in fact, even if each weight $w_i^S$ is correlated to the other weights and to the sample mean $\hat\mu_i(S)$, their sum is equal to one.
+For sake of comparison, we provide the upper bound to the variance of \OWE
+\begin{theorem}\label{T:Variance}
+ The variance of \OWE~is upper bounded by
+ $$\mathrm{Var}\left(\est{\WE}\right) \leq \max_{i\in{1,\dots,M}} \frac{\sigma^2_i}{|S_i|}.$$
+\end{theorem}
+\begin{proof}
+ Since the weights $w_i$ computed by \OWE~are not random variables, it follows
+ \begin{align*}
+  \mathrm{Var}\left(\est{\OWE}\right) &= \mathrm{Var}\left(\sum_{i=1}^M \hat\mu_i(S) w_i\right)\\
+  &= \sum_{i=1}^M w_i^2\mathrm{Var}\left(\hat\mu_i(S)\right)\\
+  &\leq \max_{i\in{1,\dots,M}} \frac{\sigma^2_i}{|S_i|},
+ \end{align*}
+ where the inequality is motivated by $w_i^2\leq 1$.
+\end{proof}
+
+As done for the bias, in Figure~\ref{F:variance} we show the variance of the different estimators under the same settings described above.
+As the difference of the means of the two variables grows, the variance of all the estimators converges to the variance of the sample mean of the variable with the maximum expected value.
+\CV is the estimator with the largest variance since its sample means are computed using half the number of samples w.r.t.~the other estimators.
+\WE exhibits a variance slightly larger than the one of \ME, while, as expected, the variance of \OWE is always the smallest.
+
+Finally, in Figure~\ref{F:mse} we show the MSE (variance + bias$^2$) of the different estimators.
+When the difference between the two means is less than one, \WE suffers from a lower MSE than the other two estimators.
+On the other hand, \ME~is preferable when there is a variable with an expected value that is significantly larger than the other ones.
+
+\begin{figure*}
+    \begin{minipage}{0.5\textwidth}
+    \centering 
+    \setlength\figureheight{4cm}
+    \setlength\figurewidth{6cm}
+    \input{imgs/variance.tikz} 
+    \caption{Comparison of the variance of the different estimators.}\label{F:variance}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+     \centering 
+    \setlength\figureheight{4cm}
+    \setlength\figurewidth{6cm}
+    \input{imgs/mse.tikz} 
+    \caption{Comparison of the MSE of the different estimators.}\label{F:mse}
+    \end{minipage}
+\end{figure*}
